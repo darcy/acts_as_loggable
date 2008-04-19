@@ -1,0 +1,46 @@
+== acts_as_loggable
+
+This library adds simple logging to an ActiveRecord model.
+
+Heavily inspired by acts_as_commentable. Did I say heavily?
+
+== Usage
+
+class Order < ActiveRecord::Base
+  acts_as_loggable
+  ...
+end
+
+o = Order.find(1)
+log_details = {:transaction_id => "TX1234", :test => false, :foo => "bar"}
+o.logs << Log.new("Credit Card Aprroved", log_details)
+o.logs.first.message # => "Credit Card Aprroved"
+o.logs.first.details.first.label => "transaction_id"
+o.logs.first.details.first.text => "TX1234"
+
+Details are optional, also, pass a user_id to log the user_id, then o.logs.find_by_user(current_user), etc...
+
+
+== Database
+
+class CreateLoggable < ActiveRecord::Migration
+  def self.up
+    create_table "logs" do |t|
+      t.string "message"
+      t.integer "loggable_id"
+      t.string "loggable_type"
+      t.integer "user_id"
+      t.timestamps
+    end
+    create_table "log_details" do |t|
+      t.integer "log_id"
+      t.string "label"
+      t.text "detail"
+    end
+  end
+
+  def self.down
+    drop_table :logs
+    drop_table :log_details
+  end
+end
