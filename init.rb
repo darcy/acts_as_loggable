@@ -1,2 +1,2 @@
 require 'acts_as_loggable'
-ActiveRecord::Base.send(:include, Emporium::Acts::Loggable)
+ActiveRecord::Base.send(:include, Acts::Loggable)

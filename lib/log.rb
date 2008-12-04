@@ -1,10 +1,11 @@
 class Log < ActiveRecord::Base
   belongs_to :loggable, :polymorphic => true
-  validates_presence_of :loggable_type, :loggable_id
+  # validates_presence_of :loggable_type, :loggable_id
   has_many :log_details, :dependent => :destroy
   
   # NOTE: logs belong to a user
   belongs_to :user
+  belongs_to :owner, :polymorphic => true
   
   def add_detail label, detail
     return false unless label

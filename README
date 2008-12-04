@@ -1,8 +1,8 @@
 == acts_as_loggable
 
-This library adds simple logging to an ActiveRecord model.
+This library adds logging to an ActiveRecord model.
 
-Heavily inspired by acts_as_commentable. Did I say heavily?
+Inspired by acts_as_commentable.
 
 == Usage
 
@@ -11,6 +11,13 @@ class Order < ActiveRecord::Base
   ...
 end
 
+== 1. Simple
+o = Order.find(:first)
+o.logs << Log.new(:message => "Credit Card Aprroved")
+o.logs.first.message # => "Credit Card Aprroved"
+
+
+== 2. With some details
 o = Order.find(:first)
 log = Log.new(:message => "Credit Card Aprroved")
 log.details = [["transaction_id","TX1234"],["test",false],["foo","bar"]]
@@ -19,7 +26,13 @@ o.logs.first.message # => "Credit Card Aprroved"
 o.logs.first.details.first.label # => "transaction_id"
 o.logs.first.details.first.detail # => "TX1234"
 
-Details are optional, also, pass a user_id to log the user_id, then o.logs.find_by_user(current_user), etc...
+
+== 3. Adding a grouping type and an Owner
+o = Order.find(:first)
+o.logs << Log.new(:message => "Credit Card Aprroved", :group => 'card_approval', :user => User.find(:first), :owner => Store.find(:first))
+o.logs.find_by_user(current_user)
+o.logs.find_by_owner(current_store)
+o.logs.find_by_group('card_approval')
 
 
 == Database
@@ -31,6 +44,9 @@ class CreateLoggable < ActiveRecord::Migration
       t.integer "loggable_id"
       t.string "loggable_type"
       t.integer "user_id"
+      t.string "group"
+      t.integer "owner_id"
+      t.string "owner_type"
       t.timestamps
     end
     create_table "log_details" do |t|
