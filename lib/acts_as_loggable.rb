@@ -8,7 +8,7 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_loggable
-        has_many :logs, :as => :loggable, :dependent => :destroy, :order => 'created_at DESC'
+        has_many :logs, :as => :loggable, :dependent => :destroy, :order => 'created_at DESC, id DESC'
         include Acts::Loggable::InstanceMethods
         extend Acts::Loggable::SingletonMethods
       end
@@ -23,7 +23,7 @@ module Acts #:nodoc:
        
         Log.find(:all,
           :conditions => ["loggable_id = ? and loggable_type = ?", obj.id, loggable],
-          :order => "created_at DESC"
+          :order => "created_at DESC, id DESC"
         )
       end
       
@@ -36,7 +36,7 @@ module Acts #:nodoc:
         
         Log.find(:all,
           :conditions => ["user_id = ? and loggable_type = ?", user.id, loggable],
-          :order => "created_at DESC"
+          :order => "created_at DESC, id DESC"
         )
       end
     end
@@ -47,7 +47,7 @@ module Acts #:nodoc:
       def logs_ordered_by_submitted
         Log.find(:all,
           :conditions => ["loggable_id = ? and loggable_type = ?", id, self.type.name],
-          :order => "created_at DESC"
+          :order => "created_at DESC, id DESC"
         )
       end
       
@@ -56,7 +56,7 @@ module Acts #:nodoc:
         logs << log
       end
 
-      def related_logs(limit=nil, order="created_at DESC")
+      def related_logs(limit=nil, order="created_at DESC, id DESC")
         type = ActiveRecord::Base.send(:class_name_of_active_record_descendant, self.class).to_s
         conditions = "(loggable_id=#{self.id} and loggable_type='#{type}') or (owner_id=#{self.id} and owner_type='#{type}')"
         conditions << " or user_id=#{self.id}" if type == "User"
