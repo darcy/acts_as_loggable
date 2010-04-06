@@ -10,6 +10,8 @@ class ActsAsLoggableMigration < ActiveRecord::Migration
       t.string "owner_type"
       t.timestamps
     end
+    add_index "logs", ["loggable_id","loggable_type"]
+    
     create_table "log_details" do |t|
       t.integer "log_id"
       t.string "label"
